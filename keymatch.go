@@ -107,16 +107,7 @@ func Match(si *sitethrougher.SiteInfo, keywords []string) map[string]*Result {
 
 func DetailMatch(si *sitethrougher.SiteInfo, keywords []string) map[string][]*KeywordMatchURL {
 	km := make(map[string][]*KeywordMatchURL)
-	smp := tools.DiscriminateSiteTextSamePart(si)
-	low := 20
-	if len(si.SiteLinks) < 20 {
-		low = len(si.SiteLinks)
-	}
-	for _, link := range si.SiteLinks[0:low] {
-		for _, p := range smp {
-			link.InnerText = strings.ReplaceAll(link.InnerText, p.Text, "")
-		}
-	}
+
 	for _, keyword := range keywords {
 		var kmus []*KeywordMatchURL
 		for _, link := range si.SiteLinks {
