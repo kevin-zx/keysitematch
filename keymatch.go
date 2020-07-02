@@ -1,9 +1,11 @@
 package keysitematch
 
 import (
+	"fmt"
 	"github.com/kevin-zx/site-info-crawler/sitethrougher"
 	"math"
 	"strings"
+	"time"
 )
 
 type KeywordMatchURL struct {
@@ -106,58 +108,58 @@ func Match(si *sitethrougher.SiteInfo, keywords []string) map[string]*Result {
 
 func DetailMatch(si *sitethrougher.SiteInfo, keywords []string) map[string][]*KeywordMatchURL {
 	km := make(map[string][]*KeywordMatchURL)
-	for _, link := range si.SiteLinks {
-		for _, keyword := range keywords {
-			kmu := &KeywordMatchURL{
-				MatchUrl:         link.AbsURL,
-				TitleAllMatch:    false,
-				TitleMatchRate:   0,
-				H1AllMatch:       false,
-				H1MatchRate:      0,
-				ContentAllMatch:  false,
-				ContentMatchRate: 0,
-				QuoteCount:       link.QuoteCount,
-			}
-			kmu.Link = link
-			title := ""
-			if link.WebPageSeoInfo != nil {
-				title = link.WebPageSeoInfo.Title
-			}
-			kmu.TitleMatchRate, kmu.TitleAllMatch = CalculateMatchRate(keyword, title)
-			kmu.H1MatchRate, kmu.H1AllMatch = CalculateMatchRate(keyword, link.H1)
-			kmu.ContentMatchRate, kmu.ContentAllMatch = CalculateMatchRate(keyword, link.InnerText)
+	c := 0
+	nows := time.Now().Unix()
+	for _, keyword := range keywords {
+		var kmus []*KeywordMatchURL
+		for _, link := range si.SiteLinks {
+			c++
 
-			max := 0
-			hrefText := ""
-			for s,href := range link.DetailHrefTexts {
-				if len(s) < len(keyword) || len(s)-len(keyword) >= 30 {
-					continue
-				}
-				if href.Count > max {
-					max = href.Count
-					hrefText= s
-				}
+			kmu := matchURL(link, keyword)
+			kmus = append(kmus, kmu)
 
-				//mr, hrMatch := CalculateMatchRate(keyword, s)
-				//if kmu.HrefTextMatchRate <= mr {
-				//	kmu.HrefTextMatchRate = mr
-				//}
-				//kmu.HrefTextAllMatch = kmu.HrefTextAllMatch || hrMatch
-				//if kmu.HrefTextAllMatch {
-				//	break
-				//}
-			}
+		}
+		km[keyword] = kmus
+	}
+	afterS := time.Now().Unix()
+	fmt.Printf("%d,%d\n", afterS-nows, c)
+	return km
+}
 
-			kmu.HrefTextMatchRate, kmu.HrefTextAllMatch = CalculateMatchRate(keyword, hrefText)
+func matchURL(link *sitethrougher.SiteLinkInfo, keyword string) *KeywordMatchURL {
+	kmu := &KeywordMatchURL{
+		MatchUrl:         link.AbsURL,
+		TitleAllMatch:    false,
+		TitleMatchRate:   0,
+		H1AllMatch:       false,
+		H1MatchRate:      0,
+		ContentAllMatch:  false,
+		ContentMatchRate: 0,
+		QuoteCount:       link.QuoteCount,
+	}
+	kmu.Link = link
+	title := ""
+	if link.WebPageSeoInfo != nil {
+		title = link.WebPageSeoInfo.Title
+	}
+	kmu.TitleMatchRate, kmu.TitleAllMatch = CalculateMatchRate(keyword, title)
+	kmu.H1MatchRate, kmu.H1AllMatch = CalculateMatchRate(keyword, link.H1)
+	kmu.ContentMatchRate, kmu.ContentAllMatch = CalculateMatchRate(keyword, link.InnerText)
 
-			if _, ok := km[keyword]; ok {
-				km[keyword] = append(km[keyword], kmu)
-			} else {
-				km[keyword] = []*KeywordMatchURL{kmu}
-			}
+	max := 0
+	hrefText := ""
+	for s, href := range link.DetailHrefTexts {
+		if len(s) < len(keyword) || len(s)-len(keyword) >= 30 {
+			continue
+		}
+		if href.Count > max {
+			max = href.Count
+			hrefText = s
 		}
 	}
-	return km
+
+	kmu.HrefTextMatchRate, kmu.HrefTextAllMatch = CalculateMatchRate(keyword, hrefText)
+	return kmu
 }
 
 func CalculateMatchRate(key string, matchTxt string) (float64, bool) {
