@@ -26,6 +26,12 @@ github.com/kevin-zx/site-info-crawler v0.1.4 h1:o5StGP3j8yj6Sy7a7v1sZuUs1GXsB38J
 github.com/kevin-zx/site-info-crawler v0.1.4/go.mod h1:aAhE4HhDzWyTHdBT7moRENxOYF0ZpJGiI3bLuZ7XzaQ=
 github.com/kevin-zx/site-info-crawler v0.1.6 h1:0a95Zsrh/IoTNXf+pUbb8A89cs5hKaTWgzoYS6Fzd7A=
 github.com/kevin-zx/site-info-crawler v0.1.6/go.mod h1:aAhE4HhDzWyTHdBT7moRENxOYF0ZpJGiI3bLuZ7XzaQ=
+github.com/kevin-zx/site-info-crawler v0.2.1 h1:SuUfMouPfhklMs6Nowr3tKsPq6X2uLpI6xa+0Vu/E4M=
+github.com/kevin-zx/site-info-crawler v0.2.1/go.mod h1:aAhE4HhDzWyTHdBT7moRENxOYF0ZpJGiI3bLuZ7XzaQ=
+github.com/kevin-zx/site-info-crawler v0.2.2 h1:SaRMadqMsFZqhnID5EMaiJPHAjY6iZ/rDAMxZEJnnys=
+github.com/kevin-zx/site-info-crawler v0.2.2/go.mod h1:aAhE4HhDzWyTHdBT7moRENxOYF0ZpJGiI3bLuZ7XzaQ=
+github.com/kevin-zx/site-info-crawler v0.2.3 h1:yMr9JV31dpdm7RBbd5YvHyZGDJhj55wjt1po3CmC/0w=
+github.com/kevin-zx/site-info-crawler v0.2.3/go.mod h1:aAhE4HhDzWyTHdBT7moRENxOYF0ZpJGiI3bLuZ7XzaQ=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca h1:NugYot0LIVPxTvN8n+Kvkn6TrbMyxQiuvKdEwFdR9vI=
