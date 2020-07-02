@@ -2,7 +2,6 @@ package keysitematch
 
 import (
 	"github.com/kevin-zx/site-info-crawler/sitethrougher"
-	"github.com/kevin-zx/site-info-crawler/tools"
 	"math"
 	"strings"
 )
