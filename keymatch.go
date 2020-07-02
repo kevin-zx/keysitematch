@@ -109,7 +109,7 @@ func DetailMatch(si *sitethrougher.SiteInfo, keywords []string) map[string][]*Ke
 	for _, link := range si.SiteLinks {
 		for _, keyword := range keywords {
 			kmu := &KeywordMatchURL{
-				MatchUrl: link.AbsURL,
+				MatchUrl:         link.AbsURL,
 				TitleAllMatch:    false,
 				TitleMatchRate:   0,
 				H1AllMatch:       false,
@@ -128,7 +128,10 @@ func DetailMatch(si *sitethrougher.SiteInfo, keywords []string) map[string][]*Ke
 			kmu.ContentMatchRate, kmu.ContentAllMatch = CalculateMatchRate(keyword, link.InnerText)
 
 			kmu.HrefTextMatchRate, kmu.HrefTextAllMatch = CalculateMatchRate(keyword, link.HrefTxt)
-			for s, _ := range link.DetailHrefTexts {
+			for s := range link.DetailHrefTexts {
+				if len(s) < len(keyword) || len(s)-len(keyword) >= 30 {
+					continue
+				}
 				mr, hrMatch := CalculateMatchRate(keyword, s)
 				if kmu.HrefTextMatchRate <= mr {
 					kmu.HrefTextMatchRate = mr
