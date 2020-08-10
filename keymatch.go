@@ -3,7 +3,9 @@ package keysitematch
 import (
 	"github.com/kevin-zx/site-info-crawler/sitethrougher"
 	"math"
+	"runtime"
 	"strings"
+	"sync"
 )
 
 type KeywordMatchURL struct {
@@ -106,17 +108,58 @@ func Match(si *sitethrougher.SiteInfo, keywords []string) map[string]*Result {
 
 func DetailMatch(si *sitethrougher.SiteInfo, keywords []string) map[string][]*KeywordMatchURL {
 	km := make(map[string][]*KeywordMatchURL)
+	var tasks = make(chan parallelTask,len(keywords)+1)
+	var results = make(chan result)
+	core := runtime.NumCPU()
+	for i := 0; i < core; i++ {
+		go parallelMatch(tasks, results)
+	}
+	wg := sync.WaitGroup{}
+	go func() {
+		for mu := range results {
+			if _, ok := km[mu.keyword]; !ok {
+				km[mu.keyword] =[]*KeywordMatchURL{mu.kum}
+			}else{
+				km[mu.keyword] = append(km[mu.keyword], mu.kum)
+			}
+			wg.Done()
+		}
+	}()
 
 	for _, keyword := range keywords {
-		var kmus []*KeywordMatchURL
 		for _, link := range si.SiteLinks {
-			kmu := matchURL(link, keyword)
-			kmus = append(kmus, kmu)
+			wg.Add(1)
+			tasks <- parallelTask{
+				link:    link,
+				keyword: keyword,
+			}
+
 		}
-		km[keyword] = kmus
+
 	}
 
+	wg.Wait()
+	close(tasks)
+	close(results)
 	return km
+}
+
+type parallelTask struct {
+	link    *sitethrougher.SiteLinkInfo
+	keyword string
+}
+type result struct {
+	keyword string
+	kum     *KeywordMatchURL
+}
+
+func parallelMatch(tasks <-chan parallelTask, results chan<- result) {
+	for task := range tasks {
+		results <- result{
+			keyword: task.keyword,
+			kum:     matchURL(task.link, task.keyword),
+		}
+	}
 }
 
 func matchURL(link *sitethrougher.SiteLinkInfo, keyword string) *KeywordMatchURL {
