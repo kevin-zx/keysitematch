@@ -36,8 +36,25 @@ type Result struct {
 
 func Match(si *sitethrougher.SiteInfo, keywords []string) map[string]*Result {
 	sitethrougher.FillSiteLinksDetailHrefText(si)
-	kms := DetailMatch(si, keywords)
 	km := make(map[string]*Result)
+	if len(keywords) == 0 {
+		return km
+	}
+	var kms map[string][]*KeywordMatchURL
+
+	if len(keywords) == 1 {
+		// if only has one keyword we only match this keyword in primary pages
+		// and site links already sort by refer times
+		if len(si.SiteLinks) < 40 {
+			kms = DetailMatch(si.SiteLinks, keywords)
+		} else if len(si.SiteLinks) <= 140 && len(si.SiteLinks) >= 40 {
+			kms = DetailMatch(si.SiteLinks[0:40], keywords)
+		} else {
+			kms = DetailMatch(si.SiteLinks[0:len(si.SiteLinks)/3], keywords)
+		}
+	} else {
+		kms = DetailMatch(si.SiteLinks, keywords)
+	}
 	for k, ms := range kms {
 		r := &Result{
 			TitleMatchCount:    0,
@@ -106,9 +123,9 @@ func Match(si *sitethrougher.SiteInfo, keywords []string) map[string]*Result {
 	return km
 }
 
-func DetailMatch(si *sitethrougher.SiteInfo, keywords []string) map[string][]*KeywordMatchURL {
+func DetailMatch(siteLinks []*sitethrougher.SiteLinkInfo, keywords []string) map[string][]*KeywordMatchURL {
 	km := make(map[string][]*KeywordMatchURL)
-	var tasks = make(chan parallelTask,len(keywords)+1)
+	var tasks = make(chan parallelTask, len(keywords)+1)
 	var results = make(chan result)
 	core := runtime.NumCPU()
 	for i := 0; i < core; i++ {
@@ -118,8 +135,8 @@ func DetailMatch(si *sitethrougher.SiteInfo, keywords []string) map[string][]*Ke
 	go func() {
 		for mu := range results {
 			if _, ok := km[mu.keyword]; !ok {
-				km[mu.keyword] =[]*KeywordMatchURL{mu.kum}
-			}else{
+				km[mu.keyword] = []*KeywordMatchURL{mu.kum}
+			} else {
 				km[mu.keyword] = append(km[mu.keyword], mu.kum)
 			}
 			wg.Done()
@@ -127,7 +144,7 @@ func DetailMatch(si *sitethrougher.SiteInfo, keywords []string) map[string][]*Ke
 	}()
 
 	for _, keyword := range keywords {
-		for _, link := range si.SiteLinks {
+		for _, link := range siteLinks {
 			wg.Add(1)
 			tasks <- parallelTask{
 				link:    link,
