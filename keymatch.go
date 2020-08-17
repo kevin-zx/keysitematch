@@ -35,7 +35,7 @@ type Result struct {
 }
 
 func Match(si *sitethrougher.SiteInfo, keywords []string) map[string]*Result {
-	sitethrougher.FillSiteLinksDetailHrefText(si)
+	//sitethrougher.FillSiteLinksDetailHrefText(si)
 	km := make(map[string]*Result)
 	if len(keywords) == 0 {
 		return km
@@ -134,6 +134,7 @@ func DetailMatch(siteLinks []*sitethrougher.SiteLinkInfo, keywords []string) map
 	wg := sync.WaitGroup{}
 	go func() {
 		for mu := range results {
+
 			if _, ok := km[mu.keyword]; !ok {
 				km[mu.keyword] = []*KeywordMatchURL{mu.kum}
 			} else {
