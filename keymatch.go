@@ -2,6 +2,7 @@ package keysitematch
 
 import (
 	"github.com/kevin-zx/site-info-crawler/sitethrougher"
+	"log"
 	"math"
 	"runtime"
 	"strings"
@@ -41,19 +42,12 @@ func Match(si *sitethrougher.SiteInfo, keywords []string) map[string]*Result {
 		return km
 	}
 	var kms map[string][]*KeywordMatchURL
-
-	if len(keywords) == 1 {
-		// if only has one keyword we only match this keyword in primary pages
-		// and site links already sort by refer times
-		if len(si.SiteLinks) < 40 {
-			kms = DetailMatch(si.SiteLinks, keywords)
-		} else if len(si.SiteLinks) <= 140 && len(si.SiteLinks) >= 40 {
-			kms = DetailMatch(si.SiteLinks[0:40], keywords)
-		} else {
-			kms = DetailMatch(si.SiteLinks[0:len(si.SiteLinks)/3], keywords)
-		}
-	} else {
+	max := 5000000
+	l := max/len(keywords)
+	if len(si.SiteLinks) < l {
 		kms = DetailMatch(si.SiteLinks, keywords)
+	}else {
+		kms = DetailMatch(si.SiteLinks[0:l], keywords)
 	}
 	for k, ms := range kms {
 		r := &Result{
@@ -132,9 +126,14 @@ func DetailMatch(siteLinks []*sitethrougher.SiteLinkInfo, keywords []string) map
 		go parallelMatch(tasks, results)
 	}
 	wg := sync.WaitGroup{}
+	allTaskC := len(siteLinks) * len(keywords)
 	go func() {
+		c := 0
 		for mu := range results {
-
+			c++
+			if c%1000 == 0 {
+				log.Printf("%d / %d -----> %.2f \n", c, allTaskC, float64(c)/float64(allTaskC))
+			}
 			if _, ok := km[mu.keyword]; !ok {
 				km[mu.keyword] = []*KeywordMatchURL{mu.kum}
 			} else {
