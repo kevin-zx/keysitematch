@@ -43,10 +43,10 @@ func Match(si *sitethrougher.SiteInfo, keywords []string) map[string]*Result {
 	}
 	var kms map[string][]*KeywordMatchURL
 	max := 5000000
-	l := max/len(keywords)
+	l := max / len(keywords)
 	if len(si.SiteLinks) < l {
 		kms = DetailMatch(si.SiteLinks, keywords)
-	}else {
+	} else {
 		kms = DetailMatch(si.SiteLinks[0:l], keywords)
 	}
 	for k, ms := range kms {
@@ -109,7 +109,7 @@ func Match(si *sitethrougher.SiteInfo, keywords []string) map[string]*Result {
 					isAdd = true
 				}
 			} else {
-				r.MatchIndex += int(float64(urlM.Link.QuoteCount) * math.Pow(urlM.H1MatchRate/2.0, 5))
+				r.MatchIndex += int(float64(urlM.Link.QuoteCount) * math.Pow(urlM.ContentMatchRate/2.0, 5))
 			}
 		}
 
