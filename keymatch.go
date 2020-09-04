@@ -30,7 +30,7 @@ type Result struct {
 	ContentMatchCount   int
 	MaxContentMatchRate float64
 	HrefTextMatchCount  int
-	MatchIndex          int
+	MatchIndex          float64
 	HomePageMatchRate   float64
 	HomePageMatchType   string
 }
@@ -79,37 +79,37 @@ func Match(si *sitethrougher.SiteInfo, keywords []string) map[string]*Result {
 			isAdd := false
 			if urlM.HrefTextAllMatch {
 				r.HrefTextMatchCount += 1
-				r.MatchIndex += urlM.Link.QuoteCount * 4
+				r.MatchIndex += float64(urlM.Link.QuoteCount * 4)
 				isAdd = true
 			} else {
-				r.MatchIndex += int(float64(urlM.Link.QuoteCount) * math.Pow(urlM.HrefTextMatchRate/2.0, 1))
+				r.MatchIndex += float64(urlM.Link.QuoteCount) * math.Pow(urlM.HrefTextMatchRate/2.0, 1)
 			}
 			if urlM.TitleAllMatch {
 				r.TitleMatchCount += 1
 				if !isAdd {
-					r.MatchIndex += urlM.Link.QuoteCount * 3
+					r.MatchIndex += float64(urlM.Link.QuoteCount * 3)
 					isAdd = true
 				}
 			} else {
-				r.MatchIndex += int(float64(urlM.Link.QuoteCount) * math.Pow(urlM.TitleMatchRate/2.0, 2))
+				r.MatchIndex += float64(urlM.Link.QuoteCount) * math.Pow(urlM.TitleMatchRate/2.0, 2)
 			}
 			if urlM.H1AllMatch {
 				r.H1MatchCount += 1
 				if !isAdd {
-					r.MatchIndex += urlM.Link.QuoteCount * 2
+					r.MatchIndex += float64(urlM.Link.QuoteCount * 2)
 					isAdd = true
 				}
 			} else {
-				r.MatchIndex += int(float64(urlM.Link.QuoteCount) * math.Pow(urlM.H1MatchRate/2.0, 3))
+				r.MatchIndex += float64(urlM.Link.QuoteCount) * math.Pow(urlM.H1MatchRate/2.0, 3)
 			}
 			if urlM.ContentAllMatch {
 				r.ContentMatchCount += 1
 				if !isAdd {
-					r.MatchIndex += urlM.Link.QuoteCount
+					r.MatchIndex += float64(urlM.Link.QuoteCount)
 					isAdd = true
 				}
 			} else {
-				r.MatchIndex += int(float64(urlM.Link.QuoteCount) * math.Pow(urlM.ContentMatchRate/2.0, 5))
+				r.MatchIndex += float64(urlM.Link.QuoteCount) * math.Pow(urlM.ContentMatchRate/2.0, 5)
 			}
 		}
 
